@@ -11,6 +11,12 @@ class Dir(Enum):
     DOWN = 3
 
 
+class GameStatus(Enum):
+    MOVED = -1
+    WIN = 10
+    DEAD = -10
+
+
 class Game:
     MAP_SIZE = 12
     N_WALL = 20
@@ -22,6 +28,7 @@ class Game:
     def __init__(self):
         self.map = [[Game.EMPTY for _ in range(Game.MAP_SIZE)] for _ in range(Game.MAP_SIZE)]
         self.agent: Vector2D = Vector2D(1, 1)
+        self.status: GameStatus = GameStatus()
         self.init_map()
         self.display()
 
@@ -65,9 +72,13 @@ class Game:
 
         new_pos = self.agent + move
         if self.map[new_pos.y][new_pos.x] != Game.EMPTY:
+            if self.map[new_pos.y][new_pos.x] == Game.GOAL:
+                self.status = GameStatus.WIN
+            else:
+                self.status = GameStatus.DEAD
             self.reset()
             return
-
+        self.status = GameStatus.MOVED
         self.map[self.agent.y][self.agent.x] = Game.EMPTY
         self.agent = new_pos
         self.update_map()
